@@ -1,7 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 
-import tailwindScrollbar from 'tailwind-scrollbar';
-
 export default {
     content: [
         "./index.html",
@@ -17,7 +15,7 @@ export default {
                 sans: ['Inter', 'sans-serif'],
             },
             backgroundImage: {
-                'custom-bg': "url('@/assets/images/background.jpg')",
+                'custom-bg': "bg-[linear-gradient(to_bottom,#62405A,#7B3F6D,#AC3557,#4E74A8,#9B658E)]",
             },
             keyframes: {
 
@@ -27,6 +25,6 @@ export default {
             
         },
     },
-    plugins: [tailwindScrollbar],
+    plugins: [],
 }
 
