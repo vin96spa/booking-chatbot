@@ -22,7 +22,9 @@ function Chat() {
     };
 
     useEffect(() => {
-        scrollToBottom();
+        if (messages.length > 2) {
+            scrollToBottom();
+        }
     }, [messages]);
 
 
@@ -74,11 +76,14 @@ function Chat() {
         }
     };
   return (
-      <div className='h-screen bg-[#62405A] flex flex-col'>
-            <TopBar />
+      <>
+        <div className='fixed top-0 left-0 right-0 z-20'>
+                <TopBar />
+        </div>
 
+        <div className='min-h-screen bg-[#62405A] pt-[68px] md:pt-[72px] pb-[140px] md:pb-[150px]'>
             {/* Message Area */}
-          <div className='flex-1 overflow-y-auto custom-scrollbar px-[30px] md:px-[100px] pt-2 py-5'>
+          <div className='h-full overflow-y-auto custom-scrollbar px-[30px] md:px-[100px] py-5'>
               <div className='max-w-4xl mx-auto'>
                 {
                     messages.map((message) => (
@@ -90,13 +95,14 @@ function Chat() {
                     ))
                 }
                   <div ref={messagesEndRef} />
+                </div>
               </div>
-              <div className='h-[100px]'></div>
             </div>
 
             {/* Input area */}
-          <div className='w-full bg-[#62405A] border-t border-white/10 px-5 py-5 z-10'>
-              <div className='relative mx-auto max-w-[700px]'>
+          <div className='fixed bottom-0 left-0 right-0'>
+              <div className='bg-[#62405A] border-t border-white/10 px-5 py-4'>
+                <div className='relative mx-auto max-w-[700px]'>
                     <input
                       className='w-full px-5 py-2 pr-12 rounded-full shadow-lg'
                         placeholder='Inizia a prenotare ...'
@@ -130,6 +136,7 @@ function Chat() {
             </div>
             <Footer />
     </div> 
+    </>
   )
 }
 
