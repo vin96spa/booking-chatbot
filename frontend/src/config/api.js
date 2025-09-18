@@ -9,7 +9,7 @@ export const config = {
     isDevelopment,
     isProduction,
     endpoints: {
-        chat: `${API_URL}/chat`,
+        chat: `${API_URL}/api/chat`,
         health: `${API_URL}/health`,
         queue: `${API_URL}/queue`,
     }

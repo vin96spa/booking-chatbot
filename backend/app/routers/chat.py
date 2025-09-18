@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -10,6 +12,8 @@ from ..models.chat_models import ChatMessage, ChatResponse
 
 router = APIRouter()
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 session_manager = SessionManager()
 
@@ -34,8 +38,18 @@ async def start_chat(request: ChatRequest, app_request: Request):
 
         session_data["message_count"] = session_data.get("message_count", 0) + 1
 
+        logger.debug(f"PRIMA di salvare USER message:")
+        logger.debug(f"Session {session_id} - Messages count: {len(session_data.get('messages', []))}")
+        for i, msg in enumerate(session_data.get('messages', [])):
+            logger.debug(f"  {i}: {msg['role']} - {msg['content'][:50]}...")
+
         # Salva messaggio utente
         session_manager.add_message(session_id, "user", request.message)
+
+        logger.debug(f"DOPO aver salvato USER message:")
+        logger.debug(f"Session {session_id} - Messages count: {len(session_data.get('messages', []))}")
+        for i, msg in enumerate(session_data.get('messages', [])):
+            logger.debug(f"  {i}: {msg['role']} - {msg['content'][:50]}...")
 
         # Response manager preso da app.state
         response_manager = app_request.app.state.response_manager
@@ -63,9 +77,25 @@ async def start_chat(request: ChatRequest, app_request: Request):
                     yield f"data: {json.dumps(event)}\n\n"
                     await asyncio.sleep(0.1)
 
+                logger.debug(f"PRIMA di salvare ASSISTANT response:")
+                logger.debug(f"Complete response length: {len(complete_response)}")
+                logger.debug(f"Complete response content: '{complete_response[:100]}...'")
+                logger.debug(f"Session {session_id} - Messages count PRIMA: {len(session_data.get('messages', []))}")
+                for i, msg in enumerate(session_data.get('messages', [])):
+                    logger.debug(f"  {i}: {msg['role']} - {msg['content'][:50]}...")
+
+
                 # Salva la risposta completa dell'assistant nella sessione
                 if complete_response.strip():
                     session_manager.add_message(session_id, "assistant", complete_response.strip())
+
+                    logger.debug(f"DOPO aver salvato ASSISTANT response:")
+                    session_data_final = session_manager.get_session(session_id)
+                    logger.debug(
+                        f"Session {session_id} - Messages count DOPO: {len(session_data_final.get('messages', []))}")
+                    for i, msg in enumerate(session_data_final.get('messages', [])):
+                        logger.debug(f"  {i}: {msg['role']} - {msg['content'][:50]}...")
+
 
                 # Notifica di completamento
                 yield f"data: {json.dumps({'type': 'done', 'data': ''})}\n\n"

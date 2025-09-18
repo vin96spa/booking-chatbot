@@ -44,8 +44,8 @@ class OpenAIService:
             Dict[str, str]: Eventi della conversazione (typing, messaggi chunk, errori, ecc.).
         """
         try:
-            yield {"type": "typing", "data": "L'operatore sta digitando..."}
-            await asyncio.sleep(random.uniform(1, 3))
+            #yield {"type": "typing", "data": "prova 1"}
+            #await asyncio.sleep(random.uniform(1, 3))
 
             system_prompt = get_system_prompt(frustration_level)
             messages = self._build_conversation(system_prompt, conversation_history, user_message)
@@ -131,7 +131,7 @@ class OpenAIService:
                 model=self.model,
                 messages=messages,
                 stream=True,
-                max_tokens=150,
+                max_tokens=100,
                 temperature=0.8,
             )
 
