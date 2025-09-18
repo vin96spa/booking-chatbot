@@ -6,7 +6,7 @@ import os
 
 from .routers import chat
 from .services.openai_services import OpenAIService as OpenAIServiceOpenAI
-from .services.gemini_services import OpenAIService as OpenAIServiceGemini
+#from .services.gemini_services import OpenAIService as OpenAIServiceGemini
 from .services.response_manager import ResponseManager
 
 load_dotenv()
