@@ -21,15 +21,15 @@ async def lifespan(app: FastAPI):
         raise Exception("Nessuna API key trovata. Imposta OPENAI_API_KEY o GEMINI_API_KEY nel .env")
 
     # Scegli provider (commenta quello che non usi)
-    openai_service = OpenAIServiceOpenAI(api_key=api_key)
-    response_manager = ResponseManager(openai_service)
+    #openai_service = OpenAIServiceOpenAI(api_key=api_key)
+    #response_manager = ResponseManager(openai_service)
 
-    #gemini_service = OpenAIServiceGemini(api_key=api_key2)
-    #response_manager = ResponseManager(gemini_service)
+    gemini_service = OpenAIServiceGemini(api_key=api_key2)
+    response_manager = ResponseManager(gemini_service)
 
     # Iniettiamo i servizi nello state dell’app
-    app.state.openai_service = openai_service
-    #app.state.gemini_service = gemini_service
+    #app.state.openai_service = openai_service
+    app.state.gemini_service = gemini_service
     app.state.response_manager = response_manager
 
     yield

@@ -20,8 +20,8 @@ class OpenAIService:
                                        frustration_level: int = 1
                                        ) -> AsyncGenerator[Dict[str, str], None]:
         try:
-            yield {"type": "typing", "data": "L'operatore sta digitando..."}
-            await asyncio.sleep(random.uniform(1, 3))
+            #yield {"type": "typing", "data": "L'operatore sta digitando..."}
+            #await asyncio.sleep(random.uniform(1, 3))
 
             system_prompt = get_system_prompt(frustration_level)
             messages = self._build_conversation(system_prompt, conversation_history, user_message)
