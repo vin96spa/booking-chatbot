@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Any
 import time
+import random
 from datetime import datetime, timedelta
 
 
@@ -77,6 +78,9 @@ class SessionManager:
             'timestamp': time.time(),
         }
 
+        frustration = random.randint(1, 6) # Simula il cambiamento del livello di frustrazione
+        print(f"Nuovo livello di frustrazione: {frustration}")
+        self.sessions[session_id]['frustration_level'] = frustration  
         self.sessions[session_id]['messages'].append(message)
 
         # Mantieni solo gli ultimi 50 messaggi per performance

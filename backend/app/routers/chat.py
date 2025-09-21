@@ -23,7 +23,7 @@ class ChatRequest(BaseModel):
     session_id: str | None = None
 
 
-@router.post("/chat")
+@router.post("/chat1")
 async def start_chat(request: ChatRequest, app_request: Request):
     try:
         # Recupera o crea sessione
