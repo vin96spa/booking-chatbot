@@ -61,7 +61,7 @@ class OpenAIService:
 
         except Exception as e:
             logger.error(f"Errore Openai service: {e}")
-            yield {"type": "Error", "data": "Mi dispiace, ce un problema tecnico. La ricontatterò al più presto!"}
+            yield {"type": "Error", "data": "Mi dispiace, c'è un problema tecnico. La ricontatterò al più presto!"}
 
     async def _simulate_helpful_then_frustrating(
         self,
@@ -131,7 +131,7 @@ class OpenAIService:
                 model=self.model,
                 messages=messages,
                 stream=True,
-                max_tokens=100,
+                max_tokens=50, #limita il num di token che il modello genera. utile per non sprecare credito dell'API
                 temperature=0.8,
             )
 
@@ -161,6 +161,10 @@ class OpenAIService:
         """
         messages = [{"role": "system", "content": system_prompt}]
 
+        # Handle None history gracefully
+        if history is None:
+            history = []
+        
         for msg in history[-10:]:
             messages.append(msg)
 

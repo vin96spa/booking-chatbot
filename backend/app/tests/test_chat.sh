@@ -36,6 +36,8 @@ cat "$TEMP_FILE"
 
 # Estrai il session_id con regex corretto
 SESSION_ID=$(grep -o '"session_id","data":"[^"]*"' "$TEMP_FILE" | head -1 | sed 's/.*"data":"\([^"]*\)".*/\1/')
+# Option 1 - Using grep with more flexible pattern:
+SESSION_ID=$(grep -o '"type".*"session_id".*"data".*"[^"]*"' "$TEMP_FILE" | sed 's/.*"data": *"\([^"]*\)".*/\1/')
 
 echo -e "\n✅ Session ID estratto: '$SESSION_ID'"
 
