@@ -21,7 +21,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Inizializza il servizio AI e lo salva nello stato dell'app
-    ai_service = get_ai_service("GEMINI_API_KEY") # OPENAI_API_KEY o GEMINI_API_KEY
+    ai_service = get_ai_service("OPENAI_API_KEY") # OPENAI_API_KEY o GEMINI_API_KEY
     app.state.ai_service = ai_service
     print(f"Usando servizio AI: {type(ai_service).__name__}")
 
