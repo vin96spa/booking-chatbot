@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
       } : undefined
     },
     define: {
-      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:8000')
+      __VITE_API_URL__: JSON.stringify(env.VITE_API_URL || 'http://localhost:8000')
     },
     build: {
       outDir: 'dist',

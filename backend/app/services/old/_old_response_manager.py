@@ -1,7 +1,7 @@
 import random
 import asyncio
 from typing import Dict, List, AsyncGenerator
-from .openai_services import OpenAIService
+from ._old_openai_services import OpenAIService
 from ..utils.prompts import get_escalation_responses
 
 
@@ -212,4 +212,4 @@ class ResponseManager:
         """Simula la promessa di un callback che non arriverà mai."""
         yield {"type": "typing", "data": "Capisco la sua urgenza..."}
         await asyncio.sleep(2)
-        yield {"type": "message", "data": "La ricontatteremo entro 5-7 giorni lavorativi. Grazie per la pazienza!"}
+        yield {"type": "message", "data": "La ricontatteremo entro 5-7 giorni lavorativi (oppure 8-9 se i sindacati indicono sciopero). Grazie per la pazienza!"}
