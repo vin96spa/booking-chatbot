@@ -72,12 +72,14 @@ function Chat() {
 				message: newMessage.message,
 			})
 			.then(function (response) {
-				if (response.data.content == "") throw new Error("Empty response data");
+				let aiMsg = response.data.content;
+				if (aiMsg == "") throw new Error("Empty response data");
 
+				aiMsg = aiMsg.replaceAll("\n*", "");
 				const botMessage: Message = {
 					id: Date.now(),
 					isChatBot: true,
-					message: response.data.content,
+					message: aiMsg,
 				};
 
 				setTimeout(() => {
