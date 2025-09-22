@@ -9,6 +9,7 @@ function TopBar() {
 		const response = await api.delete(
 			`${config.endpoints.closeChat}/${localStorage.getItem("chat_session_id")}`
 		);
+		localStorage.removeItem("chat_session_id");
 		console.log(response.data.detail);
 	};
 
