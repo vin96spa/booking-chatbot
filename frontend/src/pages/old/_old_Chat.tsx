@@ -2,7 +2,11 @@ import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import MessageBox from "@/components/MessageBox";
 import { useState, useEffect, useRef } from "react";
-import { ChatService, ChatMessage, ChatEvent } from "@/services/chatService";
+import {
+	ChatService,
+	ChatMessage,
+	ChatEvent,
+} from "@/services/old/_old_chatService";
 
 function Chat() {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);

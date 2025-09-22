@@ -77,10 +77,10 @@ class SessionManager:
             'content': content,
             'timestamp': time.time(),
         }
-
-        frustration = random.randint(1, 6) # Simula il cambiamento del livello di frustrazione
-        print(f"Nuovo livello di frustrazione: {frustration}")
-        self.sessions[session_id]['frustration_level'] = frustration  
+   
+        level = self.change_frustration_level()  # Simula il cambiamento del livello di frustrazione
+        self.sessions[session_id]['frustration_level'] = level
+        self.sessions[session_id]['last_access'] = time.time()
         self.sessions[session_id]['messages'].append(message)
 
         # Mantieni solo gli ultimi 50 messaggi per performance
@@ -91,6 +91,22 @@ class SessionManager:
         self.sessions[session_id]['last_access'] = time.time()
 
         return True
+    
+    def change_frustration_level(self) -> int:
+        """
+        Cambia il livello di frustrazione della sessione in modo casuale.
+
+        Args:
+            session_id (str): Identificativo della sessione.
+
+        Returns:
+            int: Il nuovo livello di frustrazione (1-5).
+        """
+
+        level = random.randint(1, 5)
+        print(f"Nuovo livello di frustrazione: {level}")
+
+        return level
 
     def get_conversation_history(self, session_id: str) -> List[Dict[str, str]]:
         """

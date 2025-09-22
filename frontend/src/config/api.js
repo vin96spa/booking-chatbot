@@ -11,6 +11,7 @@ export const config = {
 	endpoints: {
 		startChat: `${API_URL}/api/start_chat`,
 		chat: `${API_URL}/api/chat`,
+		closeChat: `${API_URL}/api/close_chat`,
 		health: `${API_URL}/health`,
 		queue: `${API_URL}/queue`,
 	},

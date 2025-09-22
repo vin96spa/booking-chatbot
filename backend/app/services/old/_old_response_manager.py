@@ -1,7 +1,7 @@
 import random
 import asyncio
 from typing import Dict, List, AsyncGenerator
-from .openai_services import OpenAIService
+from ._old_openai_services import OpenAIService
 from ..utils.prompts import get_escalation_responses
 
 

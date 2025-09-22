@@ -1,17 +1,15 @@
-import { ChatService } from "@/services/chatService";
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { config, api } from "@/config/api";
 
 function TopBar() {
 	let navigate = useNavigate();
-	const chatService = useRef(new ChatService());
 
 	const clearSession = async () => {
-		try {
-			await chatService.current.clearSession();
-		} catch (error) {
-			console.error("Error clearing session:", error);
-		}
+		console.log("clear chat session");
+		const response = await api.delete(
+			`${config.endpoints.closeChat}/${localStorage.getItem("chat_session_id")}`
+		);
+		console.log(response.data.detail);
 	};
 
 	const goToDashboard = () => {

@@ -3,7 +3,6 @@ import TopBar from "@/components/TopBar";
 import MessageBox from "@/components/MessageBox";
 import chatExample from "@/mockup/chatExample";
 import { useState, useEffect, useRef } from "react";
-import { ChatService } from "@/services/chatService";
 import { config, api } from "@/config/api";
 
 interface Message {
@@ -16,9 +15,8 @@ function Chat() {
 	const [messages, setMessages] = useState<Message[]>(chatExample.messages);
 	const [inputValue, setInputValue] = useState("");
 	const [isTyping, setIsTyping] = useState(false);
-	const [isWaiting, setIsWaiting] = useState(false);
+	const [isWaiting] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const chatService = useRef(new ChatService());
 	const hasCreatedSession = useRef(false);
 
 	const scrollToBottom = () => {
@@ -123,6 +121,7 @@ function Chat() {
 			handleSend();
 		}
 	};
+
 	return (
 		<>
 			<div className="fixed top-0 left-0 right-0 z-20">

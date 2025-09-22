@@ -7,8 +7,8 @@ import json
 import uuid
 import asyncio
 
-from ..services.session_manager import SessionManager
-from ..models.chat_models import ChatMessage, ChatResponse
+from ...services.session_manager import SessionManager
+from ...models.chat_models import ChatMessage, ChatResponse
 
 router = APIRouter()
 
