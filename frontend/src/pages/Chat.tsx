@@ -31,7 +31,7 @@ function Chat() {
 			hasCreatedSession.current = true;
 			const response = await api.get(config.endpoints.startChat);
 			console.log(response.data);
-			localStorage.setItem("chat_session_id", response.data);
+			localStorage.setItem("chat_session_id", response.data.session_id);
 		};
 
 		createSession();
@@ -65,7 +65,7 @@ function Chat() {
 			setMessages((prevMessages) => [...prevMessages, loadingMessage]);
 		}, 500);
 
-		//TODO: Inserire logica comunicazione BE
+		// Richiede la risposta del bot
 		api
 			.post(config.endpoints.chat, {
 				session_id: localStorage.getItem("chat_session_id"),

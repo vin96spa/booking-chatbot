@@ -1,7 +1,8 @@
 from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
+from ..models.chat_models import AiModel, GeminiChatMessage, OpenAIChatMessage
 import time
 import random
-from datetime import datetime, timedelta
 
 
 class SessionManager:
@@ -57,7 +58,7 @@ class SessionManager:
         """
         return self.sessions.get(session_id)
 
-    def add_message(self, session_id: str, role: str, content: str) -> bool:
+    def add_message(self, session_id: str, role: str, content: str, ai_model: AiModel) -> bool:
         """
         Aggiunge un messaggio alla cronologia di una sessione.
 
@@ -72,16 +73,17 @@ class SessionManager:
         if session_id not in self.sessions:
             return False
 
-        message = {
-            'role': role,
-            'content': content,
-            'timestamp': time.time(),
-        }
-   
+        message = {}
+        if ai_model == AiModel.GEMINI:
+            message = GeminiChatMessage(role=role, parts=[content])
+        else:   
+            message = OpenAIChatMessage(role=role, content=content)
+            
         level = self.change_frustration_level()  # Simula il cambiamento del livello di frustrazione
+
         self.sessions[session_id]['frustration_level'] = level
         self.sessions[session_id]['last_access'] = time.time()
-        self.sessions[session_id]['messages'].append(message)
+        self.sessions[session_id]['messages'].append(message.__dict__)
 
         # Mantieni solo gli ultimi 50 messaggi per performance
         if len(self.sessions[session_id]['messages']) > 50:
@@ -96,15 +98,11 @@ class SessionManager:
         """
         Cambia il livello di frustrazione della sessione in modo casuale.
 
-        Args:
-            session_id (str): Identificativo della sessione.
-
         Returns:
             int: Il nuovo livello di frustrazione (1-5).
         """
 
         level = random.randint(1, 5)
-        print(f"Nuovo livello di frustrazione: {level}")
 
         return level
 
@@ -120,7 +118,9 @@ class SessionManager:
         """
         if session_id not in self.sessions:
             return []
+        
         messages = self.sessions[session_id]['messages']
+
         return messages[-20:]
 
     def clear_session(self, session_id: str) -> bool:

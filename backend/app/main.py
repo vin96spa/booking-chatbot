@@ -13,7 +13,8 @@ import asyncio
 #from .services.old._old_response_manager import ResponseManager
 from .services.session_manager import SessionManager
 from .services.ai_service import AiService, GeminiService, OpenAIService
-from .models.chat_models import ChatRequest
+from .models.chat_models import AiModel, ChatRequest
+from .utils.prompts import get_waiting_words, get_transfer_words
 from fastapi import HTTPException
 
 load_dotenv()
@@ -23,7 +24,14 @@ async def lifespan(app: FastAPI):
     # Inizializza il servizio AI e lo salva nello stato dell'app
     ai_service = get_ai_service("OPENAI_API_KEY") # OPENAI_API_KEY o GEMINI_API_KEY
     app.state.ai_service = ai_service
-    print(f"Usando servizio AI: {type(ai_service).__name__}")
+
+    service_name = type(ai_service).__name__
+    print(f"Usando servizio AI: {service_name}")
+
+    if service_name == "GeminiService":
+        app.state.ai_model = AiModel.GEMINI
+    else:
+        app.state.ai_model = AiModel.OPENAI
 
     #openai_key = os.getenv("OPENAI_API_KEY")
     #gemini_key = os.getenv("GEMINI_API_KEY")
@@ -96,15 +104,15 @@ app.add_middleware(
 #app.include_router(chat.router, prefix="/api", tags=["chat"])
 
 
+@app.get("/")
+async def root():
+    return {"message": "Frustrating Chatbot API v1.0"}
+
+
 # Health check
 @app.get("/health")
 async def health():
     return {"status": "healthy", "service": "frustrating-bot"}
-
-
-@app.get("/")
-async def root():
-    return {"message": "Frustrating Chatbot API v1.0"}
 
 
 @app.get("/api/start_chat")
@@ -114,22 +122,50 @@ async def start_chat():
   print(f"Nuova chat, session_id: {session_id}")
   session_manager.get_or_create_session(session_id)
 
-  return session_id
+  return {"session_id": session_id}
+
 
 @app.post("/api/chat")
 async def get_response(request: ChatRequest):
-  await asyncio.sleep(0.5)  # 500ms di pausa
+  #await asyncio.sleep(0.5)  # 500ms di pausa
 
   try:
     ai_service = app.state.ai_service
+
+    # Recupera la sessione corrente
     current_session = session_manager.get_session(request.session_id)
-    session_manager.add_message(request.session_id, "user", request.message)
+
+    # Aggiunge il messaggio dell'utente alla cronologia della sessione
+    session_manager.add_message(request.session_id, "user", request.message, app.state.ai_model)
+
     frustration = current_session["frustration_level"]
     print(f"frustration level: {frustration}")
-    response = ai_service.send_message(request.message, frustration)
-    session_manager.add_message(request.session_id, "assistant", response)
 
-    return {"role": "assistant", "content": response}
+    # Invia la cronologia dei messaggi all'AI
+    history = session_manager.get_conversation_history(request.session_id)
+    response = ai_service.send_message(frustration, history)
+    print(f"AI response: {response}")
+
+    waiting = False
+    for word in get_waiting_words():
+        if word in response.lower():
+            waiting = True
+            break
+
+    transfer = False
+    for word in get_transfer_words():
+        if word in response.lower():
+            transfer = True
+            break
+
+    role = "assistant"
+    if app.state.ai_model == AiModel.GEMINI:
+        role = "model"
+
+    # Aggiunge il messaggio dell'AI alla cronologia della sessione
+    session_manager.add_message(request.session_id, role, response, app.state.ai_model)
+    
+    return {"role": "assistant", "content": response, "waiting": waiting, "transfer": transfer}
   
   except Exception as e:
     if "quota" in str(e).lower() or "limit" in str(e).lower():
@@ -145,6 +181,7 @@ async def get_response(request: ChatRequest):
             detail="Errore temporaneo del server. Riprova tra poco."
         )
     
+
 @app.delete("/api/close_chat/{session_id}")
 async def close_chat(session_id: str):
     print(f"Chiusura chat, session_id: {session_id}")
