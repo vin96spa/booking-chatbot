@@ -110,7 +110,7 @@ desktop.ini
 *.temp
 ~*
 
-# Package manager locks (controverso - team deve decidere)
-# package-lock.json
+# Package manager locks
+frontend/package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
