@@ -452,13 +452,13 @@ function Chat() {
 					}
 				}, 600);
 			})
-			.catch(function (error: Error) {
+			.catch(function (error: any) {
 				console.error(error);
 				setTimeout(() => {
 					const errorMessage: Message = {
 						id: Date.now() + 2,
 						isChatBot: true,
-						message: "Il servizio è momentaneamente non disponibile. Riprovare più tardi.",
+						message: error.response?.data?.detail,
 					};
 
 					setMessages((prevMessages) => {
