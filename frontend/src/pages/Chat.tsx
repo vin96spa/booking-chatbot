@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import MessageBox from "@/components/MessageBox";
-import SessionErrorModal from "@/components/SessionErrorModal";
+import ErrorModal from "@/components/ErrorModal";
 import chatExample from "@/mockup/chatExample";
 import { useState, useEffect, useRef } from "react";
 import { config, api } from "@/config/api";
@@ -258,6 +258,8 @@ function Chat() {
 	// Stati per la modale di errore
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const [sessionErrorMessage, setSessionErrorMessage] = useState("");
+	const [errorModalTitle, setErrorModalTitle] = useState("");
+	const [errorModalSubtitle, setErrorModalSubtitle] = useState("");
 
 	const { playWaiting, playTransfer, stopAudio, isAudioReady } = useWebAudioChat();
 
@@ -310,6 +312,8 @@ function Chat() {
 
 				setSessionErrorMessage(errorMsg);
 				setShowErrorModal(true);
+				setErrorModalTitle("Errore di Connessione");
+				setErrorModalSubtitle("Non è stato possibile creare la sessione di chat.");
 			}
 		};
 
@@ -325,6 +329,8 @@ function Chat() {
 	const handleErrorModalConfirm = () => {
 		// Pulisci eventuali dati di sessione
 		localStorage.removeItem("chat_session_id");
+		setErrorModalTitle("");
+		setErrorModalSubtitle("");
 
 		// Naviga alla dashboard
 		navigate("/dashboard");
@@ -454,21 +460,27 @@ function Chat() {
 			})
 			.catch(function (error: any) {
 				console.error(error);
-				setTimeout(() => {
-					const errorMessage: Message = {
-						id: Date.now() + 2,
-						isChatBot: true,
-						message: error.response?.data?.detail,
-					};
+				// Caso Too Many Requests (limite API raggiunto)
+				if (error.status === 429) {
+					setErrorModalTitle("Attenzione!");
+					setErrorModalSubtitle("Limite token raggiunto. Riprova più tardi.");
+					setShowErrorModal(true);
+				} else {
+					setTimeout(() => {
+						const errorMessage: Message = {
+							id: Date.now() + 2,
+							isChatBot: true,
+							message: error.response?.data?.detail,
+						};
 
-					setMessages((prevMessages) => {
-						const filteredMessages = prevMessages.filter(
-							(msg) => msg.message !== "..."
-						);
-						return [...filteredMessages, errorMessage];
-					});
-				}, 1000);
-				
+						setMessages((prevMessages) => {
+							const filteredMessages = prevMessages.filter(
+								(msg) => msg.message !== "..."
+							);
+							return [...filteredMessages, errorMessage];
+						});
+					}, 1000);
+				}
 
 				setIsWaiting(false);
 				setIsTransfer(false);
@@ -490,8 +502,10 @@ function Chat() {
 	return (
 		<>
 
-			<SessionErrorModal
+			<ErrorModal
 				isOpen={showErrorModal}
+				title={errorModalTitle}
+				subtitle={errorModalSubtitle}
 				errorMessage={sessionErrorMessage}
 				onConfirm={handleErrorModalConfirm}
 			/>

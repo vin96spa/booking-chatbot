@@ -1,10 +1,12 @@
 interface ErrorModalProps {
     isOpen: boolean;
+    title: string;
+    subtitle: string;
     errorMessage: string;
     onConfirm: () => void;
 }
 
-const SessionErrorModal: React.FC<ErrorModalProps> = ({ isOpen, errorMessage, onConfirm }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, title, subtitle, errorMessage, onConfirm }) => {
     if (!isOpen) return null;
 
     return (
@@ -37,10 +39,10 @@ const SessionErrorModal: React.FC<ErrorModalProps> = ({ isOpen, errorMessage, on
                     {/* Body */}
                     <div className="px-6 pb-4">
                         <h2 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                            Errore di Connessione
+                            { title }
                         </h2>
                         <p className="text-gray-600 text-center mb-1">
-                            Non è stato possibile creare la sessione di chat.
+                            { subtitle }
                         </p>
                         {errorMessage && (
                             <p className="text-sm text-gray-500 text-center mt-2">
@@ -64,4 +66,4 @@ const SessionErrorModal: React.FC<ErrorModalProps> = ({ isOpen, errorMessage, on
     );
 };
 
-export default SessionErrorModal;
+export default ErrorModal;
