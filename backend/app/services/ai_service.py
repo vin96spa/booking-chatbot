@@ -28,6 +28,7 @@ class GeminiService(AiService):
     
     response = model.generate_content(contents=messages)
     ai_msg = response.text
+    print(f"prompt: {system_instruction}") # x TEST e log
 
     return ai_msg
   

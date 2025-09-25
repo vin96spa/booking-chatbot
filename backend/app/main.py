@@ -7,10 +7,6 @@ import os
 import uuid
 import asyncio
 
-#from .routers.old import _old_chat
-#from .services.old._old_openai_services import OpenAIService as OpenAIServiceOpenAI
-#from .services.old._old_gemini_services import OpenAIService as OpenAIServiceGemini
-#from .services.old._old_response_manager import ResponseManager
 from .services.session_manager import SessionManager
 from .services.ai_service import AiService, GeminiService, OpenAIService
 from .models.chat_models import AiModel, ChatRequest
@@ -22,7 +18,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Inizializza il servizio AI e lo salva nello stato dell'app
-    ai_service = get_ai_service("OPENAI_API_KEY") # OPENAI_API_KEY o GEMINI_API_KEY
+    ai_service = get_ai_service("GEMINI_API_KEY") # <-- DECIDI QUI SE VUOI USARE "OPENAI_API_KEY" o "GEMINI_API_KEY"
     app.state.ai_service = ai_service
 
     service_name = type(ai_service).__name__
@@ -33,31 +29,10 @@ async def lifespan(app: FastAPI):
     else:
         app.state.ai_model = AiModel.OPENAI
 
-    #openai_key = os.getenv("OPENAI_API_KEY")
-    #gemini_key = os.getenv("GEMINI_API_KEY")
-    #print(f"lifespan context manager avviato")
-
-    #if not openai_key or not gemini_key:
-    #    raise Exception("Nessuna API key trovata. Imposta OPENAI_API_KEY o GEMINI_API_KEY nel .env")
-
-    # Scegli provider (commenta quello che non usi)
-    #openai_service = OpenAIServiceOpenAI(api_key=openai_key)
-    #response_manager = ResponseManager(openai_service)
-
-    #gemini_service = OpenAIServiceGemini(api_key=gemini_key)
-    #response_manager = ResponseManager(gemini_service)
-
-    # Iniettiamo i servizi nello state dell’app
-    #app.state.openai_service = openai_service
-    #app.state.gemini_service = gemini_service
-    #app.state.response_manager = response_manager
-
     yield
 
     # Chiusura risorse app
     ai_service = None
-
-
 
 def get_ai_service(api_key: str) -> AiService:
     print(f"get service per {api_key}")
@@ -139,20 +114,23 @@ async def get_response(request: ChatRequest):
     session_manager.add_message(request.session_id, "user", request.message, app.state.ai_model)
 
     frustration = current_session["frustration_level"]
-    print(f"frustration level: {frustration}")
+    print(f"frustration level: {frustration}") # x TEST e log
 
     # Invia la cronologia dei messaggi all'AI
     history = session_manager.get_conversation_history(request.session_id)
     response = ai_service.send_message(frustration, history)
-    print(f"AI response: {response}")
+    print(f"history + message: {history}") # x TEST e log
+    print(f"AI response: {response}") # x TEST e log
 
     waiting = False
+    # keywords del messaggio dell'assistente che kickstartano l'attesa
     for word in get_waiting_words():
         if word in response.lower():
             waiting = True
             break
 
     transfer = False
+    # keywords del messaggio dell'assistente che kickstartano il trasferimento
     for word in get_transfer_words():
         if word in response.lower():
             transfer = True
