@@ -5,9 +5,7 @@ function TopBar() {
 	let navigate = useNavigate();
 
 	const clearSession = async () => {
-		const response = await api.delete(
-			`${config.endpoints.closeChat}/${localStorage.getItem("chat_session_id")}`
-		);
+		await api.delete(`${config.endpoints.closeChat}/${localStorage.getItem("chat_session_id")}`);
 		localStorage.removeItem("chat_session_id");
 	};
 
@@ -17,26 +15,27 @@ function TopBar() {
 	};
 
 	return (
-		<>
-			<div className="flex bg-[#6F092F] h-auto px-[20px] py-[10px] md:px-[40px] md:py-[10px]">
-				<div className="flex-1 flex gap-3 md:gap-6 items-center">
+		<header className="bg-[#6F092F] text-[#F5F5F5] shadow-md">
+			<div className="max-w-6xl mx-auto flex justify-between items-center px-6 py-3 md:py-4">
+				<div className="flex items-center gap-3 md:gap-4">
 					<img
-						className="w-8 h-8 md:w-12 md:h-12"
+						className="w-10 h-10 md:w-12 md:h-12"
 						alt="logo"
 						src="./logo.png"
 					/>
-					<h1 className="text-[#C2FEBD] text-base md:text-2xl font-bold">
+					<h1 className="text-white text-lg md:text-2xl font-bold">
 						EasyReserve
 					</h1>
 				</div>
+
 				<button
-					className="self-center bg-[#ECE8E8] text-black font-bold text-base md:text-lg rounded-full w-auto h-auto px-[8px] py-[4px]"
+					className="bg-[#F5F5F5] text-[#6F092F] font-semibold text-sm md:text-base px-4 py-2 rounded-full shadow hover:bg-gray-200 transition-colors"
 					onClick={goToDashboard}
 				>
 					Chiudi Chat
 				</button>
 			</div>
-		</>
+		</header>
 	);
 }
 

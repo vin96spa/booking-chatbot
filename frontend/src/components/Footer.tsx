@@ -1,14 +1,24 @@
 function Footer() {
   return (
-    <>
-      <div className="bg-[#BAB5B6] flex flex-col md:flex-row md: justify-between px-10 md:py-2">
-        <div className=' text-center text-[14px] pt-3'>Copyright (c) 2025 Vincenzo Spagnolo</div>
-        <div className='text-center text-[10px] md:text-xs pt-1 pb-2'>Music from #Uppbeat (free for Creators!): <br />
-          <a className="ml-1 text-blue-600" href="https://uppbeat.io/t/kevin-macleod/long-stroll">https://uppbeat.io/t/kevin-macleod/long-stroll</a></div>
-    </div>
-      
-    </>
-  )
+    <footer className="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 text-gray-800">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center px-6 py-4 gap-2 md:gap-0">
+        <div className="text-center text-sm md:text-base">
+          © 2025 Vincenzo Spagnolo
+        </div>
+        <div className="text-center text-xs md:text-sm">
+          Music from <span className="font-semibold">Uppbeat</span> (free for Creators!): <br />
+          <a 
+            className="text-blue-600 hover:text-blue-800 transition-colors" 
+            href="https://uppbeat.io/t/kevin-macleod/long-stroll"
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            https://uppbeat.io/t/kevin-macleod/long-stroll
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
 }
 
-export default Footer
+export default Footer;
