@@ -124,17 +124,35 @@ async def get_response(request: ChatRequest):
 
     waiting = False
     # keywords del messaggio dell'assistente che kickstartano l'attesa
-    for word in get_waiting_words():
-        if word in response.lower():
-            waiting = True
-            break
+    if not "?" in response: # gestione edge case di bot che fa domanda a user e non dev'essere ancora messo in attesa
+        for word in get_waiting_words():
+            if word in response.lower():
+                waiting = True
+                break
+    print(f"waiting: {waiting}") # x TEST e log
+
 
     transfer = False
     # keywords del messaggio dell'assistente che kickstartano il trasferimento
-    for word in get_transfer_words():
-        if word in response.lower():
-            transfer = True
-            break
+    if not "?" in response: # gestione edge case di bot che fa domanda a user e non dev'essere ancora trasferito
+        for word in get_transfer_words():
+            if word in response.lower():
+                transfer = True
+                break
+    print(f"transfer: {transfer}") # x TEST e log
+
+    if transfer == True and waiting == True: #gestione edge case di prompt con sia kw trasferimento e kw attesa
+        transfer = False
+        waiting = False
+        print(f"edge case both transfer and waiting = True. New values: ") # x TEST e log
+        print(f"transfer: {transfer}")
+        print(f"waiting: {waiting}")
+        
+    funny_personality = False
+    if frustration >= 3:
+        funny_personality = True
+    print(f"funny_personality: {funny_personality}") # x TEST e log
+    
 
     role = "assistant"
     if app.state.ai_model == AiModel.GEMINI:
@@ -143,7 +161,7 @@ async def get_response(request: ChatRequest):
     # Aggiunge il messaggio dell'AI alla cronologia della sessione
     session_manager.add_message(request.session_id, role, response, app.state.ai_model)
     
-    return {"role": "assistant", "content": response, "waiting": waiting, "transfer": transfer}
+    return {"role": "assistant", "content": response, "waiting": waiting, "transfer": transfer, "funny_personality": funny_personality}
   
   except Exception as e:
     if "quota" in str(e).lower() or "limit" in str(e).lower():
