@@ -254,6 +254,7 @@ function Chat() {
 	const [isTransfer, setIsTransfer] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const hasCreatedSession = useRef(false);
+	const [footerHeight, setFooterHeight] = useState(60);
 
 	// Stati per la modale di errore
 	const [showErrorModal, setShowErrorModal] = useState(false);
@@ -262,6 +263,10 @@ function Chat() {
 	const [errorModalSubtitle, setErrorModalSubtitle] = useState("");
 
 	const { playWaiting, playTransfer, stopAudio, isAudioReady } = useWebAudioChat();
+
+	const handleFooterHeightChange = (height: number) => {
+		setFooterHeight(height);
+	};
 
 	useEffect(() => {
 		if (!isAudioReady) return;
@@ -366,73 +371,7 @@ function Chat() {
 			})
 			.then(function (response: ResponseInterface) {
 
-				if (response.data.waiting) {
-					setIsWaiting(true);
-					setIsTransfer(false);
-
-					const waitingMessage: Message = {
-						id: Date.now() + 10,
-						isChatBot: true,
-						message: "Ti metto in attesa...",
-					};
-
-					setMessages((prevMessages) => {
-						const filteredMessages = prevMessages.filter(
-							(msg) => msg.message !== "..."
-						);
-						return [...filteredMessages, waitingMessage];
-					});
-
-					setTimeout(() => {
-						setIsTransfer(false);
-						setIsWaiting(false);
-
-						const operatorMessage: Message = {
-							id: Date.now() + 11,
-							isChatBot: true,
-							message: "Eccomi, dove eravamo rimasti?",
-						};
-
-						setMessages((prevMessages) => [...prevMessages, operatorMessage]);
-					}, 10000);
-					return;
-				} else if (response.data.transfer) {
-					setIsWaiting(false);
-					setIsTransfer(true);
-
-					const transferMessage: Message = {
-						id: Date.now() + 10,
-						isChatBot: true,
-						message: "Ti sto trasferendo ad un operatore, attendi...",
-					};
-
-					setMessages((prevMessages) => {
-						const filteredMessages = prevMessages.filter(
-							(msg) => msg.message !== "..."
-						);
-						return [...filteredMessages, transferMessage];
-					});
-
-					setTimeout(() => {
-						setIsTransfer(false);
-						setIsWaiting(false);
-
-
-						const operatorMessage: Message = {
-							id: Date.now() + 11,
-							isChatBot: true,
-							message: "Operatore connesso. Come posso aiutarti?",
-						};
-
-						setMessages((prevMessages) => [...prevMessages, operatorMessage]);
-					}, 25000);
-					return;
-				} else {
-					setIsWaiting(false);
-					setIsTransfer(false);
-				}
-
-				let aiMsg = response.data.content;
+				let aiMsg: any = response.data.content;
 				if (aiMsg == "") throw new Error("Empty response data");
 
 				aiMsg = aiMsg.replaceAll("\n*", "");
@@ -457,6 +396,74 @@ function Chat() {
 						setIsTransfer(false);
 					}
 				}, 600);
+
+				setTimeout(() => {
+					if (response.data.waiting) {
+						setIsWaiting(true);
+						setIsTransfer(false);
+
+						const waitingMessage: Message = {
+							id: Date.now() + 10,
+							isChatBot: true,
+							message: "Ti metto in attesa...",
+						};
+
+						setMessages((prevMessages) => {
+							const filteredMessages = prevMessages.filter(
+								(msg) => msg.message !== "..."
+							);
+							return [...filteredMessages, waitingMessage];
+						});
+
+						setTimeout(() => {
+							setIsTransfer(false);
+							setIsWaiting(false);
+
+							const operatorMessage: Message = {
+								id: Date.now() + 11,
+								isChatBot: true,
+								message: "Eccomi, dove eravamo rimasti?",
+							};
+
+							setMessages((prevMessages) => [...prevMessages, operatorMessage]);
+						}, 10000);
+						return;
+					} else if (response.data.transfer) {
+						setIsWaiting(false);
+						setIsTransfer(true);
+
+						const transferMessage: Message = {
+							id: Date.now() + 10,
+							isChatBot: true,
+							message: "Ti sto trasferendo ad un operatore, attendi...",
+						};
+
+						setMessages((prevMessages) => {
+							const filteredMessages = prevMessages.filter(
+								(msg) => msg.message !== "..."
+							);
+							return [...filteredMessages, transferMessage];
+						});
+
+						setTimeout(() => {
+							setIsTransfer(false);
+							setIsWaiting(false);
+
+
+							const operatorMessage: Message = {
+								id: Date.now() + 11,
+								isChatBot: true,
+								message: "Operatore connesso. Come posso aiutarti?",
+							};
+
+							setMessages((prevMessages) => [...prevMessages, operatorMessage]);
+						}, 25000);
+						return;
+					} else {
+						setIsWaiting(false);
+						setIsTransfer(false);
+					}
+				}, 3000)
 			})
 			.catch(function (error: any) {
 				console.error(error);
@@ -514,9 +521,11 @@ function Chat() {
 				<TopBar />
 			</div>
 
-			<div className="fixed top-[52px] md:top-[68px] bottom-[140px] md:bottom-[130px] left-0 right-0 bg-[#62405A] pb-2">
+			<div className="fixed top-[52px] md:top-[68px] left-0 right-0 bg-[#62405A] pb-2" style={{
+				bottom: `${footerHeight + 72}px`
+			}}>
 				{/* Message Area */}
-				<div className="h-full overflow-y-auto custom-scrollbar px-[30px] md:px-[100px] py-5">
+				<div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar px-[30px] md:px-[100px] py-5">
 					<div className="max-w-4xl mx-auto">
 						{messages.map((message) => (
 							<MessageBox
@@ -555,7 +564,7 @@ function Chat() {
 			</div>
 
 			{/* Input area */}
-			<div className="fixed bottom-0 left-0 right-0">
+			<div className="fixed left-0 right-0 bottom-0">
 				<div className="bg-[#62405A] border-t border-white/10 px-5 py-4">
 					<div className="relative mx-auto max-w-[700px]">
 						<input
@@ -590,7 +599,7 @@ function Chat() {
 						</button>
 					</div>
 				</div>
-				<Footer />
+				<Footer onHeightChange={handleFooterHeightChange} />
 			</div>
 		</>
 	);
