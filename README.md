@@ -26,11 +26,11 @@ During the interaction, the chatbot will present two different personalities: th
 <br><br>
 <img width="1702" height="1038" alt="immagine" src="https://github.com/user-attachments/assets/50e6540e-f254-47a2-b728-2307b2ee686d" />
 <br>
-Users can start a new chat by clicking "Prenota ora" button on the initial page.
-<br>
+*Users can start a new chat by clicking "Prenota ora" button on the initial page.*
+<br><br>
 <img width="1702" height="1038" alt="immagine" src="https://github.com/user-attachments/assets/aad4363c-bf4a-437f-a7d0-49fbdbd48cb8" />
 <br>
-Users can close the chat by clicking on "Chiudi chat" button in the top right. This will also delete the current session from the system. No data about the chat and the session will be saved.
+*Users can close the chat by clicking on "Chiudi chat" button in the top right. This will also delete the current session from the system. No data about the chat and the session will be saved.*
 
 ## API
 <img width="467" height="47" alt="image" src="https://github.com/user-attachments/assets/008cad59-e1a2-4805-ac58-8a15a62bcea5" />
