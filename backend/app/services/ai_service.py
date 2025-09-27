@@ -11,7 +11,7 @@ class AiService(ABC):
   def get_instructions(self, frustration) -> str:
     """
       Recupera il prompt per istruire l'AI. 
-      In modo causale potrebbe essere aggiunto al prompt uno specifico scenario di frustrazione.
+      In modo casuale potrebbe essere aggiunto al prompt uno specifico scenario di frustrazione.
 
       Returns:
           str: Le istruzioni per il sistema AI.
