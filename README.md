@@ -6,7 +6,7 @@ Clone this project in a local folder.
 Installing Docker Desktop and digit the following command in the prompt:
 `docker-compose up --build`.
 
-Finally, open your browser to this link: [http://localhost:5173/]
+Finally, open your browser to this link: [[http://localhost:5173/]]
 
 ## Technologies used
 - UI/UX Design: Figma
@@ -14,7 +14,7 @@ Finally, open your browser to this link: [http://localhost:5173/]
 - Front-End: React + Tailwind
 - AI Models: Gemini (`gemini-2.0-flash-exp`) for tests + OpenAI (`gpt-4o-mini`) in production
 - Music Effects: Web Audio API
-- Music: Uppbeat [https://uppbeat.io/track/kevin-macleod/long-stroll]
+- Music: Uppbeat [[https://uppbeat.io/track/kevin-macleod/long-stroll]]
 - Deployment: Railway (BE) + Vercel (FE)
 
 ## Features
