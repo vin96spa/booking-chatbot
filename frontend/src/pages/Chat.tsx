@@ -414,6 +414,12 @@ function Chat() {
 
 	// UseEffect per l'auto-focus
 	useEffect(() => {
+		const isMobile = /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+
+		// Se siamo su mobile, non fare nulla
+		if (isMobile) return;
+
+
 		const currentBotMessageCount = messages.filter(msg =>
 			msg.isChatBot && msg.message !== "..."
 		).length;
@@ -423,16 +429,6 @@ function Chat() {
 				// Focus sull'input solo se non è disabilitato
 				if (inputRef.current && !inputRef.current.disabled) {
 					inputRef.current.focus();
-
-					const isMobile = /mobile/i.test(navigator.userAgent);
-					if (isMobile) {
-						// Scroll smooth verso l'input
-						inputRef.current.scrollIntoView({
-							behavior: 'smooth',
-							block: 'end',
-							inline: 'nearest'
-						});
-					}
 				}
 			}, 100); // Delay di 100ms per permettere al DOM di aggiornarsi
 		}
@@ -441,13 +437,17 @@ function Chat() {
 
 	// Focus iniziale quando il componente è montato
 	useEffect(() => {
-		const initialFocus = setTimeout(() => {
-			if (inputRef.current && !inputRef.current.disabled) {
-				inputRef.current.focus();
-			}
-		}, 500);
+		const isMobile = /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+
+		if (!isMobile) {
+			const initialFocus = setTimeout(() => {
+				if (inputRef.current && !inputRef.current.disabled) {
+					inputRef.current.focus();
+				}
+			}, 500);
 
 		return () => clearTimeout(initialFocus);
+		}
 	}, []);
 
 	useEffect(() => {
@@ -696,11 +696,14 @@ function Chat() {
 				setIsWaiting(false);
 				setIsTransfer(false);
 
-				setTimeout(() => {
-					if (inputRef.current && !inputRef.current.disabled) {
-						inputRef.current.focus();
-					}
-				}, 1100);
+				const isMobile = /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+				if (!isMobile) {
+					setTimeout(() => {
+						if (inputRef.current && !inputRef.current.disabled) {
+							inputRef.current.focus();
+						}
+					}, 1100);
+				}
 			})
 			.finally(() => {
 				setIsTyping(false);
