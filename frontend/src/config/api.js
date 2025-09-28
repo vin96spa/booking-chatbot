@@ -1,4 +1,3 @@
-// Configurazione API centralizzata - USA import.meta.env per Vite!
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 

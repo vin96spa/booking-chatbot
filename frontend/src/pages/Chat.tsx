@@ -13,6 +13,7 @@ interface Message {
 	id: number;
 	isChatBot: boolean;
 	message: string;
+	funny_personality?: boolean;
 }
 
 interface ResponseInterface {
@@ -21,8 +22,117 @@ interface ResponseInterface {
 		role: string;
 		transfer: boolean;
 		waiting: boolean;
+		funny_personality?: boolean;
 	}
 }
+
+// Hook per gestire il resize del viewport su Firefox mobile
+const useFirefoxMobileViewportFix = () => {
+	const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+	const lastValidHeight = useRef(window.innerHeight);
+	const isFirefoxMobile = useRef(false);
+
+	useEffect(() => {
+		const userAgent = navigator.userAgent.toLowerCase();
+		isFirefoxMobile.current = /firefox/.test(userAgent) && /mobile/.test(userAgent);
+
+		if (!isFirefoxMobile.current) return;
+
+		const initialHeight = window.innerHeight;
+		lastValidHeight.current = initialHeight;
+
+		let resizeTimer: NodeJS.Timeout;
+		let lastHeight = initialHeight;
+
+		const handleResize = () => {
+			clearTimeout(resizeTimer);
+
+			resizeTimer = setTimeout(() => {
+				const currentHeight = window.innerHeight;
+
+				// Ignora cambiamenti minimi (< 50px) che potrebbero essere glitch
+				if (Math.abs(currentHeight - lastHeight) < 50) {
+					return;
+				}
+
+				// Se l'altezza aumenta più del 40% rispetto all'ultima valida,
+				// probabilmente è un bug di Firefox
+				if (currentHeight > lastValidHeight.current * 1.4) {
+					console.warn('Firefox viewport bug detected, using last valid height');
+					setViewportHeight(lastValidHeight.current);
+				} else {
+					// Aggiorna l'altezza valida
+					if (currentHeight > 0 && currentHeight < window.screen.height * 1.2) {
+						lastValidHeight.current = currentHeight;
+						setViewportHeight(currentHeight);
+					}
+				}
+
+				lastHeight = currentHeight;
+			}, 100);
+		};
+
+		// Gestisci anche il focus/blur degli input per rilevare la tastiera
+		const handleFocus = () => {
+			setTimeout(() => {
+				const height = window.innerHeight;
+				if (height > 0 && height < lastValidHeight.current) {
+					// Tastiera probabilmente aperta
+					setViewportHeight(height);
+				}
+			}, 300);
+		};
+
+		const handleBlur = () => {
+			setTimeout(() => {
+				// Ripristina l'altezza quando la tastiera si chiude
+				setViewportHeight(lastValidHeight.current);
+			}, 300);
+		};
+
+		// Gestisci visibility change per rilevare quando l'app torna in primo piano
+		const handleVisibilityChange = () => {
+			if (!document.hidden) {
+				// Quando l'app torna visibile, forza un ricalcolo
+				setTimeout(() => {
+					const currentHeight = window.innerHeight;
+					if (currentHeight > 0 && currentHeight < window.screen.height * 1.2) {
+						if (currentHeight <= lastValidHeight.current) {
+							setViewportHeight(currentHeight);
+						} else {
+							setViewportHeight(lastValidHeight.current);
+						}
+					}
+				}, 500);
+			}
+		};
+
+		window.addEventListener('resize', handleResize);
+		window.addEventListener('orientationchange', handleResize);
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
+		// Aggiungi listener per tutti gli input
+		const inputs = document.querySelectorAll('input, textarea');
+		inputs.forEach(input => {
+			input.addEventListener('focus', handleFocus);
+			input.addEventListener('blur', handleBlur);
+		});
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			window.removeEventListener('orientationchange', handleResize);
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			clearTimeout(resizeTimer);
+
+			inputs.forEach(input => {
+				input.removeEventListener('focus', handleFocus);
+				input.removeEventListener('blur', handleBlur);
+			});
+		};
+	}, []);
+
+	return viewportHeight;
+};
 
 // Classe per gestire Web Audio API
 class WebAudioManager {
@@ -32,7 +142,7 @@ class WebAudioManager {
 	private analyser: AnalyserNode | null = null;
 	private buffer: AudioBuffer | null = null;
 	private isPlaying: boolean = false;
-	
+
 	// Nodi per effetti audio
 	private lowPassFilter: BiquadFilterNode | null = null;
 	private highPassFilter: BiquadFilterNode | null = null;
@@ -255,6 +365,11 @@ function Chat() {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const hasCreatedSession = useRef(false);
 	const [footerHeight, setFooterHeight] = useState(60);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [funnyPersonality, setFunnyPersonality] = useState(false);
+	const lastBotMessageCount = useRef(0);
+
+
 
 	// Stati per la modale di errore
 	const [showErrorModal, setShowErrorModal] = useState(false);
@@ -264,9 +379,76 @@ function Chat() {
 
 	const { playWaiting, playTransfer, stopAudio, isAudioReady } = useWebAudioChat();
 
+	// Usa il fix per Firefox mobile
+	const viewportHeight = useFirefoxMobileViewportFix();
+
 	const handleFooterHeightChange = (height: number) => {
 		setFooterHeight(height);
 	};
+
+	// Aggiungi listener per gli input dinamici
+	useEffect(() => {
+		if (inputRef.current) {
+			const input = inputRef.current;
+
+			const handleInputFocus = () => {
+				// Su Firefox mobile, forza il ricalcolo del layout
+				const isFirefox = /firefox/i.test(navigator.userAgent);
+				const isMobile = /mobile/i.test(navigator.userAgent);
+
+				if (isFirefox && isMobile) {
+					setTimeout(() => {
+						// Scorri l'input in vista se necessario
+						input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					}, 300);
+				}
+			};
+
+			input.addEventListener('focus', handleInputFocus);
+
+			return () => {
+				input.removeEventListener('focus', handleInputFocus);
+			};
+		}
+	}, []);
+
+	// UseEffect per l'auto-focus
+	useEffect(() => {
+		const currentBotMessageCount = messages.filter(msg =>
+			msg.isChatBot && msg.message !== "..."
+		).length;
+
+		if (currentBotMessageCount > lastBotMessageCount.current) {
+			setTimeout(() => {
+				// Focus sull'input solo se non è disabilitato
+				if (inputRef.current && !inputRef.current.disabled) {
+					inputRef.current.focus();
+
+					const isMobile = /mobile/i.test(navigator.userAgent);
+					if (isMobile) {
+						// Scroll smooth verso l'input
+						inputRef.current.scrollIntoView({
+							behavior: 'smooth',
+							block: 'end',
+							inline: 'nearest'
+						});
+					}
+				}
+			}, 100); // Delay di 100ms per permettere al DOM di aggiornarsi
+		}
+		lastBotMessageCount.current = currentBotMessageCount;
+	}, [messages]);
+
+	// Focus iniziale quando il componente è montato
+	useEffect(() => {
+		const initialFocus = setTimeout(() => {
+			if (inputRef.current && !inputRef.current.disabled) {
+				inputRef.current.focus();
+			}
+		}, 500);
+
+		return () => clearTimeout(initialFocus);
+	}, []);
 
 	useEffect(() => {
 		if (!isAudioReady) return;
@@ -358,6 +540,7 @@ function Chat() {
 				id: Date.now() + 1,
 				isChatBot: true,
 				message: "...",
+				funny_personality: funnyPersonality,
 			};
 
 			setMessages((prevMessages) => [...prevMessages, loadingMessage]);
@@ -371,6 +554,12 @@ function Chat() {
 			})
 			.then(function (response: ResponseInterface) {
 
+				let messagePersonality = funnyPersonality;
+				if (response.data.funny_personality !== undefined) {
+					messagePersonality = response.data.funny_personality;
+					setFunnyPersonality(response.data.funny_personality);
+				}
+
 				let aiMsg: any = response.data.content;
 				if (aiMsg == "") throw new Error("Empty response data");
 
@@ -379,6 +568,7 @@ function Chat() {
 					id: Date.now(),
 					isChatBot: true,
 					message: aiMsg,
+					funny_personality: messagePersonality,
 				};
 
 				setTimeout(() => {
@@ -391,9 +581,18 @@ function Chat() {
 					});
 					setIsTyping(false);
 
+					
+
 					if (!response.data.waiting && !response.data.transfer) {
 						setIsWaiting(false);
 						setIsTransfer(false);
+						
+						// Focus immediato dopo la risposta normale
+						setTimeout(() => {
+							if (inputRef.current && !inputRef.current.disabled) {
+								inputRef.current.focus();
+							}
+						}, 50);
 					}
 				}, 600);
 
@@ -406,6 +605,7 @@ function Chat() {
 							id: Date.now() + 10,
 							isChatBot: true,
 							message: "Ti metto in attesa...",
+							funny_personality: messagePersonality,
 						};
 
 						setMessages((prevMessages) => {
@@ -423,6 +623,7 @@ function Chat() {
 								id: Date.now() + 11,
 								isChatBot: true,
 								message: "Eccomi, dove eravamo rimasti?",
+								funny_personality: funnyPersonality,
 							};
 
 							setMessages((prevMessages) => [...prevMessages, operatorMessage]);
@@ -436,6 +637,7 @@ function Chat() {
 							id: Date.now() + 10,
 							isChatBot: true,
 							message: "Ti sto trasferendo ad un operatore, attendi...",
+							funny_personality: messagePersonality,
 						};
 
 						setMessages((prevMessages) => {
@@ -454,6 +656,7 @@ function Chat() {
 								id: Date.now() + 11,
 								isChatBot: true,
 								message: "Operatore connesso. Come posso aiutarti?",
+								funny_personality: funnyPersonality,
 							};
 
 							setMessages((prevMessages) => [...prevMessages, operatorMessage]);
@@ -470,7 +673,7 @@ function Chat() {
 				// Caso Too Many Requests (limite API raggiunto)
 				if (error.status === 429) {
 					setErrorModalTitle("Attenzione!");
-					setErrorModalSubtitle("Limite token raggiunto. Riprova più tardi.");
+					setErrorModalSubtitle("Limite token raggiunto. Riprova più tardi.");
 					setShowErrorModal(true);
 				} else {
 					setTimeout(() => {
@@ -478,6 +681,7 @@ function Chat() {
 							id: Date.now() + 2,
 							isChatBot: true,
 							message: error.response?.data?.detail,
+							funny_personality: funnyPersonality,
 						};
 
 						setMessages((prevMessages) => {
@@ -491,12 +695,23 @@ function Chat() {
 
 				setIsWaiting(false);
 				setIsTransfer(false);
+
+				setTimeout(() => {
+					if (inputRef.current && !inputRef.current.disabled) {
+						inputRef.current.focus();
+					}
+				}, 1100);
 			})
 			.finally(() => {
 				setIsTyping(false);
 			});
 
 		setInputValue("");
+
+		// Blur dell'input dopo l'invio per chiudere la tastiera
+		if (inputRef.current) {
+			inputRef.current.blur();
+		}
 	};
 
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -505,6 +720,13 @@ function Chat() {
 			handleSend();
 		}
 	};
+
+	// Calcola le altezze usando il viewport height corretto
+	const useFixedPositioning = viewportHeight > 0;
+	const messageAreaBottom = useFixedPositioning ? `${footerHeight + 72}px` : 'auto';
+	const messageAreaHeight = useFixedPositioning
+		? `calc(${viewportHeight}px - ${footerHeight + 72 + 68}px)`
+		: 'auto';
 
 	return (
 		<>
@@ -521,9 +743,14 @@ function Chat() {
 				<TopBar />
 			</div>
 
-			<div className="fixed top-[52px] md:top-[68px] left-0 right-0 bg-[#62405A] pb-2" style={{
-				bottom: `${footerHeight + 72}px`
-			}}>
+			<div
+				className="fixed top-[52px] md:top-[68px] left-0 right-0 bg-[#62405A] pb-2"
+				style={{
+					bottom: messageAreaBottom,
+					height: messageAreaHeight,
+					minHeight: '200px'
+				}}
+			>
 				{/* Message Area */}
 				<div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar px-[30px] md:px-[100px] py-5">
 					<div className="max-w-4xl mx-auto">
@@ -532,6 +759,7 @@ function Chat() {
 								key={message.id}
 								isChatBot={message.isChatBot}
 								message={message.message}
+								funny_personality={message.funny_personality}
 							/>
 						))}
 
@@ -563,11 +791,18 @@ function Chat() {
 				</div>
 			</div>
 
-			{/* Input area */}
-			<div className="fixed left-0 right-0 bottom-0">
+			{/* Input area - usa visualViewport API per Firefox mobile */}
+			<div
+				className="fixed left-0 right-0 bottom-0"
+				style={{
+					bottom: 0,
+					zIndex: 30
+				}}
+			>
 				<div className="bg-[#62405A] border-t border-white/10 px-5 py-4">
 					<div className="relative mx-auto max-w-[700px]">
 						<input
+							ref={inputRef}
 							className="w-full px-5 py-2 pr-12 rounded-full shadow-lg"
 							placeholder="Inizia a prenotare ..."
 							type="text"
@@ -575,6 +810,10 @@ function Chat() {
 							onChange={(e) => setInputValue(e.target.value)}
 							onKeyPress={handleKeyPress}
 							disabled={isTransfer || isWaiting}
+							autoComplete="off"
+							autoCorrect="off"
+							autoCapitalize="off"
+							spellCheck="false"
 						/>
 						<button
 							className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-colors"

@@ -1,9 +1,16 @@
 import { motion } from "framer-motion";
+
 interface MessageBoxProps {
 	isChatBot: boolean;
 	message: string;
+	funny_personality?: boolean;
 }
-const MessageBox: React.FC<MessageBoxProps> = ({ isChatBot, message }) => {
+
+const MessageBox: React.FC<MessageBoxProps> = ({
+	isChatBot,
+	message,
+	funny_personality = false
+}) => {
 	const isLoading = message === "...";
 
 	return (
@@ -16,15 +23,15 @@ const MessageBox: React.FC<MessageBoxProps> = ({ isChatBot, message }) => {
 			{isChatBot ? (
 				<div className="flex gap-6 mt-2">
 					<motion.img
-						src="./logo.png"
+						src={funny_personality ? "./funny-bot.gif" : "./logo.png"}
 						alt="chatbot"
-						className="w-10 h-10 self-center"
+						className="w-10 h-10 self-center object-contain"
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
 					/>
 					<motion.div
-						className="bg-[#FEC5CA] min-w-[200px] max-w-[700px] rounded-tl-lg rounded-tr-lg    rounded-bl-lg text-left p-3 shadow-lg shadow-black/30 break-words whitespace-break-spaces"
+						className="bg-[#FEC5CA] min-w-[200px] max-w-[700px] rounded-tl-lg rounded-tr-lg rounded-br-lg text-left p-3 shadow-lg shadow-black/30 break-words whitespace-break-spaces"
 						initial={{ scale: 0.8 }}
 						animate={{ scale: 1 }}
 						transition={{ delay: 0.2, type: "spring", stiffness: 150 }}

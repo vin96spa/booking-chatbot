@@ -27,7 +27,13 @@ body {
 /* UTILITIES */
 /* Buttons */
 .button-bg {
-    @apply bg-gradient-to-r from-[#D0365D] via-[#B72F51] to-[#6A1C2F];
+  @apply bg-gradient-to-r from-[#D0365D] via-[#B72F51] to-[#6A1C2F]
+         text-white transition-all duration-500 ease-in-out;
+}
+.button-bg:hover {
+  box-shadow: 0 0 15px rgba(208, 54, 93, 0.6), 
+              0 0 30px rgba(183, 47, 81, 0.5);
+  transform: translateY(-2px);
 }
 
 /* Scrollbar */
