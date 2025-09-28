@@ -23,7 +23,7 @@ def get_frustrating_scenarios() -> list[str]:
     return [
         "Mi dispiace, il reparto è chiuso per inventario.",
         "Il sistema mi dice che il suo problema non esiste.",
-        "Deve chiamare tra le 2:47 e le 2:49 del mattino per questo tipo di richiesta.",
+        "Deve ritentare tra le 2:47 e le 2:49 del mattino per questo tipo di richiesta.",
         "Il supervisore è in riunione con i supervisori dei supervisori.",
         "Per questo problema deve scrivere una lettera raccomandata al nostro ufficio sulla Luna.",
         "Il computer dice di no. Non posso discutere con il computer.",
