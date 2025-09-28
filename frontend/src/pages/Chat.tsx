@@ -587,12 +587,16 @@ function Chat() {
 						setIsWaiting(false);
 						setIsTransfer(false);
 						
-						// Focus immediato dopo la risposta normale
-						setTimeout(() => {
-							if (inputRef.current && !inputRef.current.disabled) {
-								inputRef.current.focus();
-							}
-						}, 50);
+						const isMobile = /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+
+						if (!isMobile) {
+							// Focus immediato dopo la risposta normale
+							setTimeout(() => {
+								if (inputRef.current && !inputRef.current.disabled) {
+									inputRef.current.focus();
+								}
+							}, 50);
+						}
 					}
 				}, 600);
 
