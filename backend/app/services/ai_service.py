@@ -18,10 +18,11 @@ class AiService(ABC):
       """
     system_instruction = get_system_prompt(frustration)
     frustration_scenarios = get_frustrating_scenarios()
-    n_scenarios = len(frustration_scenarios)-1
 
+    n_scenarios = len(frustration_scenarios)-1
     index = random.randint(0, n_scenarios + 5)
     print(f"frustration scenarios index: {index}")
+
     if index <= n_scenarios:
       system_instruction += " Quando il contesto è adatto, usa frasi come '" + frustration_scenarios[index] + "'."
 
@@ -43,7 +44,6 @@ class GeminiService(AiService):
     )
 
   def send_message(self, frustration, messages):
-    #system_instruction = get_system_prompt(frustration)
     system_instruction = self.get_instructions(frustration)
     model = genai.GenerativeModel(self.model, generation_config=self.config, system_instruction=system_instruction)
     
@@ -61,7 +61,6 @@ class OpenAIService(AiService):
     self.model = "gpt-4o-mini"  # "gpt-4o-mini" o "gpt-3.5-turbo"
 
   def send_message(self, frustration, messages):
-    #system_instruction = get_system_prompt(frustration)
     system_instruction = self.get_instructions(frustration)
     contents = [OpenAIChatMessage(role="system", content=system_instruction).__dict__]
     contents.extend(messages)
