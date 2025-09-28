@@ -122,13 +122,13 @@ async def get_response(request: ChatRequest):
 
     waiting = False
     # keywords del messaggio dell'assistente che kickstartano l'attesa
-    if not "?" in response: # gestione edge case di bot che fa domanda a user e non dev'essere ancora messo in attesa
+    if not "?" in response: 
+    # gestione edge case di bot che fa domanda a user e non dev'essere ancora messo in attesa
         for word in get_waiting_words():
             if word in response.lower():
                 waiting = True
                 break
     print(f"waiting: {waiting}") # x TEST e log
-
 
     transfer = False
     # keywords del messaggio dell'assistente che kickstartano il trasferimento
@@ -139,7 +139,8 @@ async def get_response(request: ChatRequest):
                 break
     print(f"transfer: {transfer}") # x TEST e log
 
-    if transfer == True and waiting == True: #gestione edge case di prompt con sia kw trasferimento e kw attesa
+    if transfer == True and waiting == True: 
+    #gestione edge case di prompt con sia kw trasferimento e kw attesa
         transfer = False
         waiting = False
         print(f"edge case both transfer and waiting = True. New values: ") # x TEST e log
@@ -151,7 +152,6 @@ async def get_response(request: ChatRequest):
         funny_personality = True
     print(f"funny_personality: {funny_personality}") # x TEST e log
     
-
     role = "assistant"
     if app.state.ai_model == AiModel.GEMINI:
         role = "model"

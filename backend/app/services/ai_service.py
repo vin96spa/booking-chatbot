@@ -8,7 +8,7 @@ from ..models.chat_models import GeminiChatMessage, OpenAIChatMessage
 
 class AiService(ABC):
 
-  def get_instructions(self, frustration) -> str:
+  def compose_instructions(self, frustration) -> str:
     """
       Recupera il prompt per istruire l'AI. 
       In modo casuale potrebbe essere aggiunto al prompt uno specifico scenario di frustrazione.
@@ -20,8 +20,8 @@ class AiService(ABC):
     frustration_scenarios = get_frustrating_scenarios()
 
     n_scenarios = len(frustration_scenarios)-1
-    index = random.randint(0, n_scenarios + 5)
-    print(f"frustration scenarios index: {index}")
+    index = random.randint(0, n_scenarios + 6)
+    print(f"frustration scenarios index: {index}") # x TEST e log
 
     if index <= n_scenarios:
       system_instruction += " Quando il contesto è adatto, usa frasi come '" + frustration_scenarios[index] + "'."
@@ -44,7 +44,7 @@ class GeminiService(AiService):
     )
 
   def send_message(self, frustration, messages):
-    system_instruction = self.get_instructions(frustration)
+    system_instruction = self.compose_instructions(frustration)
     model = genai.GenerativeModel(self.model, generation_config=self.config, system_instruction=system_instruction)
     
     response = model.generate_content(contents=messages)
@@ -61,9 +61,11 @@ class OpenAIService(AiService):
     self.model = "gpt-4o-mini"  # "gpt-4o-mini" o "gpt-3.5-turbo"
 
   def send_message(self, frustration, messages):
-    system_instruction = self.get_instructions(frustration)
+    system_instruction = self.compose_instructions(frustration)
     contents = [OpenAIChatMessage(role="system", content=system_instruction).__dict__]
     contents.extend(messages)
+    
+    print(f"prompt: {system_instruction}") # x TEST e log
 
     response = self.client.chat.completions.create(
       model=self.model,
