@@ -2,10 +2,15 @@
 A chatbot that recreates all the worst chlichés of customer service: endless waits, repetitive answers and pointless redirects. Instead of making you angry, it will make you laugh in a pleasantly frustrating way.
 
 ## Setup
-Clone this project in a local folder.
-Installing Docker Desktop and digit the following command in the prompt:
-`docker-compose up --build`.
+Clone this project in a local folder. <br>
+Install Docker Desktop and digit the following command in the prompt:
+`docker-compose up --build`.<br>
+Create a .env file inside booking-chatbot/backend;
+Create or use an OPENAI API KEY from [OpenAI API](https://platform.openai.com/api-keys);
+Put your key in the .env file as follows:
 
+    `OPENAI_API_KEY=your_key`
+<br>
 Finally, open your browser to this link: [localhost:5173](http://localhost:5173/)
 
 ## Technologies used
