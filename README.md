@@ -3,7 +3,7 @@ A chatbot that recreates all the worst chlichés of customer service: endless wa
 
 ## Setup
 1. Clone this project in a local folder. <br>
-2. Install Docker Desktop and digit the following commands in the terminal:
+2. Install Docker Desktop and digit the following commands in the terminal:<br>
 `cd path/to/booking-chatbot`<br>
 `docker-compose up --build`.<br>
 4. Create a .env file inside booking-chatbot/backend;
