@@ -8,9 +8,7 @@ Install Docker Desktop and digit the following command in the prompt:
 Create a .env file inside booking-chatbot/backend;
 Create or use an OPENAI API KEY from [OpenAI API](https://platform.openai.com/api-keys);
 Put your key in the .env file as follows:
-
-    `OPENAI_API_KEY=your_key`
-<br>
+`OPENAI_API_KEY=your_key`.<br>
 Finally, open your browser to this link: [localhost:5173](http://localhost:5173/)
 
 ## Technologies used
