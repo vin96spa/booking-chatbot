@@ -3,13 +3,14 @@ A chatbot that recreates all the worst chlichés of customer service: endless wa
 
 ## Setup
 1. Clone this project in a local folder. <br>
-2. Install Docker Desktop and digit the following command in the terminal:
+2. Install Docker Desktop and digit the following commands in the terminal:
+`cd path/to/booking-chatbot`<br>
 `docker-compose up --build`.<br>
-3. Create a .env file inside booking-chatbot/backend;
-4. Create an OPENAI API KEY from [OpenAI API](https://platform.openai.com/api-keys) (or use an existing one);<br>
-5. Put your key in the .env file as follows:
+4. Create a .env file inside booking-chatbot/backend;
+5. Create an OPENAI API KEY from [OpenAI API](https://platform.openai.com/api-keys) (or use an existing one);<br>
+6. Put your key in the .env file as follows:
 `OPENAI_API_KEY=your_key`.<br>
-6. Finally, open your browser to this link: [localhost:5173](http://localhost:5173/)
+7. Finally, open your browser to this link: [localhost:5173](http://localhost:5173/)
 
 ## Technologies used
 - UI/UX Design: Figma
